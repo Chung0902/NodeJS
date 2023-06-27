@@ -1495,4 +1495,28 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
+
+  //Hiển thị tất cả các mặt hàng có số lượng bán lớn hơn 200 sản phẩm
+
+  question28: async (req, res, next) => {
+    const { sold } = req.query; 
+    
+    const conditionFind = {
+      sold: { $gt: 100 },
+    };
+    try {
+      let results = await Product.find(conditionFind).sort({ sold: -1 });
+      let total = await Product.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+
 };
