@@ -11,8 +11,8 @@ module.exports = {
 
       const employee = await Employee.findOne({ email }).select('-password').lean();
 
-      const token = generateToken(employee, jwtSettings.ADMIN_SECRET);
-      const refreshToken = generateRefreshToken(employee._id, jwtSettings.ADMIN_SECRET);
+      const token = generateToken(employee);
+      const refreshToken = generateRefreshToken(employee._id);
 
       return res.status(200).json({
         token,
@@ -30,7 +30,7 @@ module.exports = {
     try {
       const { refreshToken } = req.body;
 
-      JWT.verify(refreshToken, jwtSettings.ADMIN_SECRET, async (err, decoded) => {
+      JWT.verify(refreshToken, jwtSettings.SECRET, async (err, decoded) => {
         if (err) {
           return res.status(401).json({
             message: 'refreshToken is invalid',
@@ -42,7 +42,7 @@ module.exports = {
           const employee = await Employee.findById(id).select('-password').lean();
 
           if (employee && employee.isActive) {
-            const token = generateToken(employee, jwtSettings.ADMIN_SECRET);
+            const token = generateToken(employee);
             
             return res.status(200).json({ token });
           }
@@ -60,8 +60,8 @@ module.exports = {
   basic: async (req, res, next) => {
     try {
       const employee = await Employee.findById(req.user._id).select('-password').lean();
-      const token = generateToken(employee, jwtSettings.ADMIN_SECRET);
-      const refreshToken = generateRefreshToken(employee._id, jwtSettings.ADMIN_SECRET);
+      const token = generateToken(employee);
+      const refreshToken = generateRefreshToken(employee._id);
 
       res.json({
         token,
