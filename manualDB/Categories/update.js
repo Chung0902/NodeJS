@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const { Category } = require('../../models');
 
-mongoose.connect('mongodb://127.0.0.1:27017/batch-29-30-database');
+mongoose.connect('mongodb://127.0.0.1:27017/batch-nodejs-database');
 
 try {
   const id = '647c0cc17a9b8ab3969db911';

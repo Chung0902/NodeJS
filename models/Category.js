@@ -13,6 +13,10 @@ const categorySchema = new Schema(
       type: String,
       maxLength: [500, 'Mô tả không được vượt quá 500 ký tự'],
     },
+    photo:{
+      data:Buffer,
+      contentType: String,
+    },
   },
   {
     versionKey: false,

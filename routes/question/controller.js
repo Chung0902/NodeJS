@@ -109,11 +109,13 @@ module.exports = {
   //Hiển thị tất cả các mặt hàng có tồn kho <= 5
 
   question2a: async (req, res, next) => {
+    const { discount } = req.query;
+    
     const conditionFind = {
-      stock: { $lte: 5 },
+      discount: { $gt: 5 },
     };
     try {
-      let results = await Product.find(conditionFind);
+      let results = await Product.find(conditionFind).sort({ discount: -1 });
       let total = await Product.countDocuments();
 
       return res.send({
