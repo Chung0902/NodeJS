@@ -1,4 +1,4 @@
-const { Product, Category, Supplier } = require("../../models");
+const { Product, Category, Supplier, Order } = require("../../models");
 
 module.exports = {
   //Hiển thị tất cả các mặt hàng có giảm giá <= 10%
@@ -110,7 +110,7 @@ module.exports = {
 
   question2a: async (req, res, next) => {
     const { discount } = req.query;
-    
+
     const conditionFind = {
       discount: { $gt: 5 },
     };
@@ -1499,8 +1499,8 @@ module.exports = {
   //Hiển thị tất cả các mặt hàng có số lượng bán lớn hơn 200 sản phẩm
 
   question28: async (req, res, next) => {
-    const { sold } = req.query; 
-    
+    const { sold } = req.query;
+
     const conditionFind = {
       sold: { $gt: 100 },
     };
@@ -1519,4 +1519,41 @@ module.exports = {
     }
   },
 
+  question29: async (req, res, next) => {
+    try {
+      let results = await Order.aggregate()
+        .match({
+          status: "COMPLETED",
+        })
+        .unwind("orderDetails")
+        .lookup({
+          from: "products",
+          localField: "orderDetails.productId",
+          foreignField: "_id",
+          as: "orderDetails.product",
+        })
+        .unwind("orderDetails.product")
+        .group({
+          _id: "$orderDetails.productId",
+          name: { $first: "$orderDetails.product.name" },
+          price: { $first: "$orderDetails.product.price" },
+          discount: { $first: "$orderDetails.product.discount" },
+          quantity: { $sum: "$orderDetails.quantity" },
+          stock: { $first: "$orderDetails.product.stock" },
+          photo: { $first: "$orderDetails.product.photo" },
+          count: { $sum: 1 },
+        })
+        .sort({ quantity: -1 });
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
 };
